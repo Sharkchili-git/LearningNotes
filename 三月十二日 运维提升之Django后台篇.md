@@ -399,6 +399,10 @@
 
       - python manage.py crontab run 立即运行定时任务
 
+      - crontab -l  查看任务有哪些
+
+      - crontab -e 已编辑状态打开任务表
+
 - ## Middleware 中间件
 
   - 什么是Django中间件
@@ -454,6 +458,74 @@
       ![1584021216849](E:\md文件\三月十二日 运维提升之Django后台篇.assets\1584021216849.png)
 
 - ## 邮件模块
+
+  注:这个本身和django没啥关系
+
+  ### QQ邮箱SMTP服务与授权码(网易的也可以)
+
+  - 简单邮件传输协议(SimpleMail Transfer Protocol)
+  - SMTP服务使用TCP端口25
+  - 使用SMTP服务需要授权码
+    - 设置中
+
+  ### 配置并使用标准库发送邮件
+
+  SMTP服务使用TCP端口25,加密通道端口是465
+
+
+
+  ```python
+  #!/usr/bin/python
+  # -*- encoding=utf-8 -*-
+  
+  
+  import os
+  import django
+  import smtplib
+  from myfirstproj import settings
+  
+  from email.mime.text import MIMEText
+  
+  
+  os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myfirstproj.settings')
+  django.setup()
+  
+  
+  def send_mail():
+      msg = MIMEText("邮件通道测试", "plain", "utf-8")
+      msg['FROM'] = "Mail Test"
+      msg['Subject'] = "【Mail Test】"
+      receivers = ['***@qq.com']
+      server = smtplib.SMTP_SSL(settings.EMAIL_HOST, settings.EMAIL_PORT)
+      server.set_debuglevel(1)
+      server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+      server.sendmail(settings.EMAIL_FROM, receivers, msg.as_string())
+      server.close()
+      pass
+  
+  
+  if __name__ == '__main__':
+      send_mail()
+  
+  ```
+
+  settings中的配置
+
+  ```python
+  # Email config
+  # QQ邮箱 SMTP 服务器地址
+  EMAIL_HOST = 'smtp.qq.com'
+  # 端口  附加码25
+  EMAIL_PORT = 465
+  # 发送邮件的邮箱
+  EMAIL_HOST_USER = '***@qq.com'
+  # 在邮箱中设置的客户端授权密码
+  EMAIL_HOST_PASSWORD = 'xxxx'
+  # 开启TLS
+  EMAIL_USE_TLS = True
+  # 收件人看到的发件人
+  EMAIL_FROM = '***@qq.com'
+  ```
 
 - ## 综合实践:基于邮件通知的服务监控和告警系统
 
